@@ -1,5 +1,6 @@
 # Agents that reads the news and report on some macro data
 from smolagents import CodeAgent
+import json
 
 def get_news_reports(model, stock, news):
     headline_selector = CodeAgent(tools=[], model=model, name="headline_selector",
@@ -20,4 +21,3 @@ def get_news_reports(model, stock, news):
     
     response = manager_agent.run(f"What is the most important news regarding stock {stock}? \n \n {news}")
     return response
-    
