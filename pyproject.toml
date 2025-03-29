@@ -7,7 +7,8 @@ requires-python = ">=3.11"
 dependencies = [
     "dotenv>=0.9.9",
     "fastapi>=0.115.12",
-    "modal>=0.73.131",
+    "modal>=0.73.135",
+    "openai>=1.69.0",
     "reportlab>=4.3.1",
     "smolagents>=1.12.0",
 ]

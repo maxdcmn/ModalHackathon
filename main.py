@@ -10,39 +10,23 @@ from reportlab.lib.enums import TA_LEFT
 from dotenv import load_dotenv
 
 
-
-
 import json
 import os
 import secrets
 
 from src.news import get_news_reports
+from src.model import VLLMModalModel
 
 
 load_dotenv()
-
-# Verify that this matches with what you have access to
-model_id = "meta-llama/Llama-3.3-70B-Instruct" 
 
 # Check that your token is being loaded properly
 hf_token = os.environ.get("HUGGINGFACEHUB_API_TOKEN")
 if not hf_token:
     print("WARNING: No Hugging Face token found in environment")
 
-model = HfApiModel(token=hf_token)
 
-# Generate a secure random API key
-def generate_api_key():
-    return secrets.token_hex(16)  # 32 character hex string
-
-# Create the secret with our API key
-api_key = generate_api_key()
-print(f"Generated API key: {api_key}")  # Display during development, remove in production
-
-# Create a Modal secret
-api_secret = modal.Secret.from_dict({"API_KEY": api_key})
-
-image = modal.Image.debian_slim().pip_install(["fastapi[standard]", "reportlab", "smolagents", "dotenv"])
+image = modal.Image.debian_slim(python_version="3.11.11").pip_install(["fastapi[standard]", "reportlab", "smolagents", "dotenv", "openai"])
 app = modal.App(name="modal-pdf-generator", image=image)
 
 
@@ -52,6 +36,13 @@ def generate_pdf(data: dict, x_api_key: str = Header(None)) -> Response:
     # Validate API key
     if x_api_key != os.environ.get("API_KEY"):
         raise HTTPException(status_code=401, detail="Invalid API key")
+    
+    VLLM_API_KEY=os.environ["VLLM_API_KEY"]
+    model = VLLMModalModel(
+        api_key=VLLM_API_KEY,
+        temperature=0.7,
+        max_tokens=512
+    )
     
     # Create a BytesIO buffer for the PDF
     buffer = BytesIO()
