@@ -15,7 +15,8 @@ echo "Generated API key: $API_KEY"
 uv run modal secret create modal-hackathon-secrets API_KEY=$API_KEY
 ```
 
-Then you copy the generate key from console output and provide it as a value to `VITE_MODAL_API_KEY=` in the frontend app's `.env`
+Then you copy the generate key from console output and provide it as a value to `VITE_MODAL_API_KEY=` in the frontend app's `.env`. You also need to add the `VITE_ALPHA_VANTAGE_API_KEY` to the frontend.
+
 
 To start the backend locally you run
 
