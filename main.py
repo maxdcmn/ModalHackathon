@@ -4,7 +4,7 @@ from smolagents import CodeAgent, HfApiModel, GradioUI
 from io import BytesIO
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Frame
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_LEFT
 from dotenv import load_dotenv
@@ -18,7 +18,7 @@ from src.news import get_news_reports
 from src.model import VLLMModalModel
 from src.overview import extract_company_info
 from src.plot_generators import generate_stock_price_plot
-
+from src.transcript import summarize_transcripts
 
 load_dotenv()
 
@@ -28,7 +28,7 @@ if not hf_token:
     print("WARNING: No Hugging Face token found in environment")
 
 
-image = modal.Image.debian_slim(python_version="3.11.11").pip_install(["fastapi[standard]", "reportlab", "smolagents", "dotenv", "openai"])
+image = modal.Image.debian_slim(python_version="3.11.11").pip_install(["fastapi[standard]", "reportlab", "smolagents", "dotenv", "openai", "matplotlib", "numpy"])
 app = modal.App(name="modal-pdf-generator", image=image)
 
 
@@ -48,11 +48,12 @@ def generate_pdf(data: dict, x_api_key: str = Header(None)) -> Response:
     
     # Create a BytesIO buffer for the PDF
     buffer = BytesIO()
-    
+    print(data["quote"])
     # news_info = get_news_reports(model, data.get("overview")["Name"], data.get("newsData"))
     
-    # dic = {key: data["overview"][key] for key in ["Symbol","AssetType","Name","Description","Sector","Industry","OfficialSite","MarketCapitalization"]}
-    overview, tables = extract_company_info(model, data["overview"])
+    # overview, tables = extract_company_info(model, data["overview"])
+    # plt = generate_stock_price_plot(model, data.get("timeSeriesData"))
+    trans = summarize_transcripts(model, data["quote"])
     
     # Create the PDF document
     doc = SimpleDocTemplate(
@@ -93,8 +94,10 @@ def generate_pdf(data: dict, x_api_key: str = Header(None)) -> Response:
     content.append(Spacer(1, 12))
     
     # content.append(Paragraph(f"{news_info}", styles['Normal']))
-    content.append(Paragraph(f"{overview}", styles["Normal"]))
-    content.append(Paragraph(f"{tables}", styles["Normal"]))
+    # content.append(Paragraph(f"{overview}", styles["Normal"]))
+    # content.append(Paragraph(f"{tables}", styles["Normal"]))
+    # content.append(Paragraph(f"{plt}",styles["Normal"]))
+    content.append(Paragraph(f"{trans}",styles["Normal"]))
     # Format the JSON data for display
     formatted_json = json.dumps(data, indent=2)
     

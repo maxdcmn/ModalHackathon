@@ -18,7 +18,7 @@ class VLLMModalModel:
     
     def __init__(
         self,
-        base_url: str = "https://tegelstenen--example-vllm-openai-compatible-serve.modal.run/v1",
+        base_url: str = "https://imjustmark--example-vllm-openai-compatible-serve.modal.run/v1",
         api_key: str = None,
         model_id: str = "neuralmagic/Meta-Llama-3.1-8B-Instruct-quantized.w4a16",
         **kwargs
