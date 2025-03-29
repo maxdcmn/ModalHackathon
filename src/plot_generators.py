@@ -8,7 +8,9 @@ def generate_stock_price_plot(model, daily):
         name="StockPricePlotGenerator",
         model=model,
         description="Generates a stock price evolution plot inspired by financial reports.",
-        instructions="""
+    )
+    
+    result = stock_price_plot_evolution_generator.run("""
         Given a JSON file containing daily stock price data, generate a visually appealing line plot similar to the provided example.
         The plot should include:
         
@@ -18,8 +20,7 @@ def generate_stock_price_plot(model, daily):
         - Proper labels, grid lines, and formatting to enhance readability.
         
         Output should be a rendered plot image.
-        """
-    )
-    
-    result = stock_price_plot_evolution_generator.run(json.dumps(daily))
+                                                      
+        The data is found in the following                                        
+        """ + json.dumps(daily))
     return result

@@ -42,6 +42,6 @@ def get_news_reports(model, stock, news):
     )
 
     # Now, let the manager agent request the web agent to search for the CEO
-    response = manager_agent.run("Use web_search to find out who is the CEO of Hugging Face.")
+    response = manager_agent.run("Use web_searcher to find out who is the CEO of Hugging Face.")
     
     return response

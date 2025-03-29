@@ -16,6 +16,8 @@ import secrets
 
 from src.news import get_news_reports
 from src.model import VLLMModalModel
+from src.overview import extract_company_info
+from src.plot_generators import generate_stock_price_plot
 
 
 load_dotenv()
@@ -40,14 +42,17 @@ def generate_pdf(data: dict, x_api_key: str = Header(None)) -> Response:
     VLLM_API_KEY=os.environ["VLLM_API_KEY"]
     model = VLLMModalModel(
         api_key=VLLM_API_KEY,
-        temperature=0.7,
-        max_tokens=512
+        temperature=0.7
+        # max_tokens=512
     )
     
     # Create a BytesIO buffer for the PDF
     buffer = BytesIO()
     
-    news_info = get_news_reports(model, data.get("overview")["Name"], data.get("newsData"))
+    # news_info = get_news_reports(model, data.get("overview")["Name"], data.get("newsData"))
+    
+    # dic = {key: data["overview"][key] for key in ["Symbol","AssetType","Name","Description","Sector","Industry","OfficialSite","MarketCapitalization"]}
+    overview, tables = extract_company_info(model, data["overview"])
     
     # Create the PDF document
     doc = SimpleDocTemplate(
@@ -77,8 +82,6 @@ def generate_pdf(data: dict, x_api_key: str = Header(None)) -> Response:
     content.append(Paragraph("Stock Analysis Data", styles['Title']))
     content.append(Spacer(1, 12))
     
-    
-    
     # Add timestamp if available
     timestamp = data.get('timestamp', 'Not provided')
     content.append(Paragraph(f"Report generated: {timestamp}", styles['Normal']))
@@ -89,7 +92,9 @@ def generate_pdf(data: dict, x_api_key: str = Header(None)) -> Response:
     content.append(Paragraph(f"Stock Symbol: {stock_symbol}", styles['Heading2']))
     content.append(Spacer(1, 12))
     
-    content.append(Paragraph(f"{news_info}", styles['Normal']))
+    # content.append(Paragraph(f"{news_info}", styles['Normal']))
+    content.append(Paragraph(f"{overview}", styles["Normal"]))
+    content.append(Paragraph(f"{tables}", styles["Normal"]))
     # Format the JSON data for display
     formatted_json = json.dumps(data, indent=2)
     
