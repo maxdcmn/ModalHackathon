@@ -37,3 +37,8 @@ echo "HUGGINGFACEHUB_API_TOKEN=YOUR_SECRET" >> .env
 # Or manually edit the .env file and add:
 # HUGGINGFACEHUB_API_TOKEN=YOUR_SECRET
 ```
+
+### deploy llm
+```zsh
+uv run modal deploy src/vllm_inference
+```
